@@ -2,8 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:crypto_viewer/pages/chart_view_screen.dart';
 import 'package:cryptocoins_icons/cryptocoins_icons.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
+import '../custome_component_style/box_decoration.dart';
+import 'mywallet_view_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CryptoData {
   final String? id;
@@ -103,9 +108,28 @@ class _CryptoViewScreenState extends State<CryptoViewScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Crypto view",
-          textAlign: TextAlign.center,
+        centerTitle:true,
+          leading: Padding(
+          padding: const EdgeInsets.only(left: 10.0),
+          child: IconButton(
+            icon: Icon(Icons.wallet, size: 40,),
+            onPressed: (){
+              Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => MyWalletScreen(),
+                    ),
+                  );
+            },
+          ),
+        ),
+        foregroundColor: const Color.fromARGB(255, 234, 234, 234),
+        elevation: 0.0,
+        backgroundColor: Color.fromARGB(255, 41, 91, 172),
+        title: Center(
+          child: const Text(
+            "Crypto view",
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
       body: SizedBox(
@@ -126,6 +150,8 @@ class _CryptoViewScreenState extends State<CryptoViewScreen> {
                       decoration: BoxDecoration(
                         color: const Color.fromARGB(255, 41, 91, 172),
                         borderRadius: BorderRadius.circular(10.0),
+                        boxShadow: BoxDecoratinStyes.CustomeBoxshadow,
+                        border: BoxDecoratinStyes.CustomeBorder,
                       ),
                       child: Center(
                           child: Row(
@@ -172,11 +198,12 @@ class _CryptoViewScreenState extends State<CryptoViewScreen> {
                           height: 30,
                           width: 60,
                           decoration: BoxDecoration(
-                            
                             color:isInMinus(showPrice(
                                     cryptoDataList[index].changePercent24Hr!)
                                     ),
                             borderRadius: BorderRadius.circular(10.0),
+                            boxShadow: BoxDecoratinStyes.CustomeBoxshadow,
+                            border: BoxDecoratinStyes.CustomeBorder,
                                   ),
                           child: Text(
                             showPrice(cryptoDataList[index].changePercent24Hr!),
@@ -199,21 +226,22 @@ class _CryptoViewScreenState extends State<CryptoViewScreen> {
                     },
                     trailing: Container(
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white, width: 2.0),
+                        border: BoxDecoratinStyes.CustomeBorder,
+                        boxShadow: BoxDecoratinStyes.CustomeBoxshadow,
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: CircleAvatar(
                         radius: 25.0,
-                        backgroundColor:
-                            const Color.fromARGB(255, 234, 234, 234),
+                        backgroundColor: Colors.grey[300],
                         child: IconButton(
                           icon: const Icon(Icons.arrow_forward_ios_outlined),
                           onPressed: () {
                             String id = cryptoDataList[index].id ?? "";
+                            CryptoData data = cryptoDataList[index];
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    ChartView(urlOfSpacificCrypto: id),
+                                    ChartView(urlOfSpacificCrypto: id, data:data, name:"old"),
                               ),
                             );
                           },

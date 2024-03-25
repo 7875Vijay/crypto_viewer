@@ -33,8 +33,12 @@ dependencies:
   http: ^1.2.1
   cryptocoins_icons: ^0.3.0
   chart_sparkline: ^1.0.15
-  fl_chart: ^0.66.2
-  
+  firebase_core: ^2.27.1
+  firebase_database: ^10.4.10
+  firebase_auth: ^4.17.9
+  form_field_validator: ^1.1.0
+  cloud_firestore: ^4.15.9
+  firebase_storage: ^11.6.10
 
 
   # The following adds the Cupertino Icons font to your application.
