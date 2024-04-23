@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:crypto_viewer/global/global_settings.dart';
 import 'package:crypto_viewer/pages/chart_view_screen.dart';
 import 'package:cryptocoins_icons/cryptocoins_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+
+import '../custome_component_style/box_decoration.dart';
+import 'mywallet_view_screen.dart';
 
 class CryptoData {
   final String? id;
@@ -41,18 +45,26 @@ class CryptoViewScreen extends StatefulWidget {
 }
 
 class _CryptoViewScreenState extends State<CryptoViewScreen> {
+  //variables:
+  var wallettype=GlobalSettngs.cryptowalletname; //tbd logically manage
   double _screenWidth = 0.0;
   late List<CryptoData> cryptoDataList;
-
+  Timer? timer;
   @override
   void initState() {
     super.initState();
     cryptoDataList = [];
     getRequest(); // Initial call to fetch data
     // Start a timer to refresh data every second
-    Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
       getRequest();
     });
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel(); // Cancel the timer to avoid memory leaks
+    super.dispose();
   }
 
   Future<void> getRequest() async {
@@ -100,133 +112,198 @@ class _CryptoViewScreenState extends State<CryptoViewScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     _screenWidth = screenWidth;
+    if(cryptoDataList==null){
+      return Center(
+        //   child: CupertinoActivityIndicator(
+        //     color: Colors.blue[900],
+        //     animating: true,
+        //     radius: 20,
+        //   ),
+        // );
+          child: CircularProgressIndicator());
+    }
+    else{
+      return Scaffold(
+        appBar: AppBar(
+          centerTitle:true,
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: IconButton(
+              icon: Icon(Icons.wallet, size: 40,),
+              onPressed: ()async{
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => MyWalletScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Crypto view",
-          textAlign: TextAlign.center,
+          foregroundColor: const Color.fromARGB(255, 234, 234, 234),
+          elevation: 0.0,
+          backgroundColor: Color.fromARGB(255, 41, 91, 172),
+          title: Center(
+            child: const Text(
+              "Crypto view",
+              textAlign: TextAlign.center,
+            ),
+
+          ),
+          actions: [
+            PopupMenuButton(
+                color: Colors.grey[300],
+                itemBuilder: (context)=>[
+                  PopupMenuItem(child: TextButton(
+                    onPressed: (){
+                        setState(() {
+                          wallettype = GlobalSettngs.cryptowalletname;
+                        });
+                    }, child: Text("Crypto view"),
+                  )),
+                  PopupMenuItem(child: TextButton(
+                    onPressed: (){
+                      setState(() {
+                        wallettype = GlobalSettngs.sharewalletname;
+                      });
+                    }, child: Text("Stock view"),
+                  )),
+                  PopupMenuItem(child: TextButton(
+                    onPressed: (){
+                      setState(() {
+                        wallettype = GlobalSettngs.sharewalletname;
+                      });
+                    }, child: Text("Trade view"),
+                  )),
+
+                ]),
+          ],
         ),
-      ),
-      body: SizedBox(
-        width: _screenWidth,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: cryptoDataList.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    tileColor: const Color.fromARGB(255, 234, 234, 234),
-                    leading: Container(
-                      width: 100.0,
-                      height: 50.0,
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 41, 91, 172),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Center(
-                          child: Row(
-                        children: [
-                          // CryptoIcons.loadAsset(cryptoDataList[index].symbol?.toUpperCase()?? "ETH", 20),
-                          const SizedBox(width: 10.0),
-                          Icon(
-                            CryptoCoinIcons.getCryptoIcon(
-                                        cryptoDataList[index].symbol!) !=
-                                    null
-                                ? CryptoCoinIcons.getCryptoIcon(
-                                    cryptoDataList[index].symbol!)
-                                : Icons.circle,
-                            size: 30.0,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 10.0),
-                          Text(
-                            cryptoDataList[index].symbol?.toUpperCase() ?? "",
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      )),
-                    ),
-                    title:
-                        Text(cryptoDataList[index].name ?? ""), //Id as a name
-                    subtitle: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start, // Align text to the left
-                      children: [
-                        Text(
-                          '\$ ${showPrice(cryptoDataList[index].priceUsd!)}',
-                          style: TextStyle(
-                            fontSize: 25.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.left,
+        body: SizedBox(
+          width: _screenWidth,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: cryptoDataList.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      tileColor: const Color.fromARGB(255, 234, 234, 234),
+                      leading: Container(
+                        width: 100.0,
+                        height: 50.0,
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 41, 91, 172),
+                          borderRadius: BorderRadius.circular(10.0),
+                          boxShadow: BoxDecoratinStyes.CustomeBoxshadow,
+                          border: BoxDecoratinStyes.CustomeBorder,
                         ),
-                        Container(
-                          padding: EdgeInsets.all(3),
-                          height: 30,
-                          width: 60,
-                          decoration: BoxDecoration(
-                            
-                            color:isInMinus(showPrice(
-                                    cryptoDataList[index].changePercent24Hr!)
-                                    ),
-                            borderRadius: BorderRadius.circular(10.0),
+                        child: Center(
+                            child: Row(
+                              children: [
+                                // CryptoIcons.loadAsset(cryptoDataList[index].symbol?.toUpperCase()?? "ETH", 20),
+                                const SizedBox(width: 10.0),
+                                Icon(
+                                  CryptoCoinIcons.getCryptoIcon(
+                                      cryptoDataList[index].symbol!) !=
+                                      null
+                                      ? CryptoCoinIcons.getCryptoIcon(
+                                      cryptoDataList[index].symbol!)
+                                      : Icons.circle,
+                                  size: 30.0,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(width: 10.0),
+                                Text(
+                                  cryptoDataList[index].symbol?.toUpperCase() ?? "",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
-                          child: Text(
-                            showPrice(cryptoDataList[index].changePercent24Hr!),
-                            style: TextStyle(
-                                fontSize: 17.0,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                            textAlign: TextAlign.center,
-                          ),
-                        )
-                      ],
-                    ),
-                    onTap: () {
-                      // String id = cryptoDataList[index].id ?? "";
-                      // Navigator.of(context).push(
-                      //   MaterialPageRoute(
-                      //     builder: (context) => ChartView(urlOfSpacificCrypto: id),
-                      //   ),
-                      // );
-                    },
-                    trailing: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white, width: 2.0),
-                        borderRadius: BorderRadius.circular(30),
+                                ),
+                              ],
+                            )),
                       ),
-                      child: CircleAvatar(
-                        radius: 25.0,
-                        backgroundColor:
-                            const Color.fromARGB(255, 234, 234, 234),
-                        child: IconButton(
-                          icon: const Icon(Icons.arrow_forward_ios_outlined),
-                          onPressed: () {
-                            String id = cryptoDataList[index].id ?? "";
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    ChartView(urlOfSpacificCrypto: id),
+                      title:
+                      Text(cryptoDataList[index].name ?? ""), //Id as a name
+                      subtitle: Column(
+                        crossAxisAlignment:
+                        CrossAxisAlignment.start, // Align text to the left
+                        children: [
+                          Text(
+                            '\$ ${showPrice(cryptoDataList[index].priceUsd!)}',
+                            style: TextStyle(
+                              fontSize: 25.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.left,
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(3),
+                            height: 30,
+                            width: 60,
+                            decoration: BoxDecoration(
+                              color:isInMinus(showPrice(
+                                  cryptoDataList[index].changePercent24Hr!)
                               ),
-                            );
-                          },
+                              borderRadius: BorderRadius.circular(10.0),
+                              boxShadow: BoxDecoratinStyes.CustomeBoxshadow,
+                              border: BoxDecoratinStyes.CustomeBorder,
+                            ),
+                            child: Text(
+                              showPrice(cryptoDataList[index].changePercent24Hr!),
+                              style: TextStyle(
+                                  fontSize: 17.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                              textAlign: TextAlign.center,
+                            ),
+                          )
+                        ],
+                      ),
+                      onTap: () {
+                        // String id = cryptoDataList[index].id ?? "";
+                        // Navigator.of(context).push(
+                        //   MaterialPageRoute(
+                        //     builder: (context) => ChartView(urlOfSpacificCrypto: id),
+                        //   ),
+                        // );
+                      },
+                      trailing: Container(
+                        decoration: BoxDecoration(
+                          border: BoxDecoratinStyes.CustomeBorder,
+                          boxShadow: BoxDecoratinStyes.CustomeBoxshadow,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: CircleAvatar(
+                          radius: 25.0,
+                          backgroundColor: Colors.grey[300],
+                          child: IconButton(
+                            icon: const Icon(Icons.arrow_forward_ios_outlined),
+                            onPressed: () {
+                              String id = cryptoDataList[index].id ?? "";
+                              CryptoData data = cryptoDataList[index];
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ChartView(urlOfSpacificCrypto: id, data:data, name:"old", wallettype:wallettype),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
-              ),
-            ],
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
+
   }
 }

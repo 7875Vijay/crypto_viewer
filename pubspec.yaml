@@ -33,8 +33,17 @@ dependencies:
   http: ^1.2.1
   cryptocoins_icons: ^0.3.0
   chart_sparkline: ^1.0.15
-  fl_chart: ^0.66.2
-  
+  firebase_core: ^2.29.0
+  firebase_database: ^10.4.10
+  firebase_auth: ^4.19.1
+  form_field_validator: ^1.1.0
+  cloud_firestore: ^4.15.9
+  firebase_storage: ^11.6.10
+  pay: ^2.0.0
+  flutter_svg: ^2.0.10+1
+  flutter_inset_box_shadow: ^1.0.8
+  cool_alert: ^2.0.1
+  mailer: ^6.1.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -50,7 +59,7 @@ dev_dependencies:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/crypto_view_app_icon.png"
+  image_path: "assets/images/newlogo.png"
   
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -73,6 +82,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/svgs/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -86,10 +96,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  fonts:
+    - family: SanFransisco
+      fonts:
+        - asset: assets/fonts/sf.otf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

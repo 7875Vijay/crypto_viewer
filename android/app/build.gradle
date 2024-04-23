@@ -4,6 +4,7 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -21,6 +22,8 @@ def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.android.application'
 
 android {
     namespace "com.example.crypto_viewer"
@@ -45,10 +48,11 @@ android {
         applicationId "com.example.crypto_viewer"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 21//flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -63,5 +67,10 @@ android {
 flutter {
     source '../..'
 }
+dependencies {
+    implementation platform('com.google.firebase:firebase-bom:30.2.0')
+    implementation 'com.google.android.gms:play-services-wallet:19.3.0'
 
-dependencies {}
+//    implementation 'com.google.firebase:firebase-analytics'
+//    kapt "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.4.2"
+}
